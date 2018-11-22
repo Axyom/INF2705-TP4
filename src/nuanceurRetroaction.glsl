@@ -34,43 +34,61 @@ void main( void )
         // se préparer à produire une valeur un peu aléatoire
         uint seed = uint(temps * 1000.0) + uint(gl_VertexID);
         // faire renaitre la particule au puits
-        //positionMod = ...
+        positionMod = posPuits;
 
         // assigner un vitesse
         vitesseMod = vec3( mix( -0.5, 0.5, myrandom(seed++) ),   // entre -0.5 et 0.5
                            mix( -0.5, 0.5, myrandom(seed++) ),   // entre -0.5 et 0.5
                            mix(  0.5, 1.0, myrandom(seed++) ) ); // entre  0.5 et 1
-        //vitesseMod = vec3( -0.8, 0., 0.6 );
 
         // nouveau temps de vie
         //tempsRestantMod = ...; // entre 0 et tempsMax secondes
-        tempsRestantMod = 0.0; // à modifier
+        tempsRestantMod = mix( 0., tempsMax, myrandom(seed++) );
 
         // interpolation linéaire entre COULMIN et COULMAX
         const float COULMIN = 0.2; // valeur minimale d'une composante de couleur lorsque la particule (re)naît
         const float COULMAX = 0.9; // valeur maximale d'une composante de couleur lorsque la particule (re)naît
-        //couleurMod = ...
+        couleurMod = vec4( mix( COULMIN, COULMAX, myrandom(seed++) ),   // entre -0.5 et 0.5
+                           mix( COULMIN, COULMAX, myrandom(seed++) ),   // entre -0.5 et 0.5
+                           mix( COULMIN, COULMAX, myrandom(seed++) ),   // entre  0.5 et 1
+                           1.0 ); 
     }
     else
     {
         // avancer la particule (méthode de Euler)
-        positionMod = position; // ...
+        positionMod = position + dt * vitesse; // ...
         vitesseMod = vitesse;
 
         // diminuer son temps de vie
-        tempsRestantMod = tempsRestant;
+        tempsRestantMod = tempsRestant - dt;
 
         // garder la couleur courante
         couleurMod = couleur;
 
         // collision avec la demi-sphère ?
-        // ...
+        vec3 posSphUnitaire = positionMod / bDim;
+        vec3 vitSphUnitaire = vitesseMod * bDim;
+        
+        float  dist = length( posSphUnitaire );
+		if ( dist  >= 1.0 ) // la  particule  est  sortie  de la  bulle
+		{
+			positionMod = ( 2.0 - dist ) * positionMod;
+			vec3 N = posSphUnitaire / dist; //  normaliser N
+			vec3  vitReflechieSphUnitaire = reflect( vitSphUnitaire , N );
+			vitesseMod = vitReflechieSphUnitaire / bDim;
+		}
 
         // collision avec le sol ?
-        // ...
+        if ( positionMod.z  <= 0.0 ) // la  particule  est  sous la bulle
+		{
+			positionMod.z = ( - positionMod.z );
+			vec3 N = vec3(0., 0., 1.); //  normaliser N
+			vitesseMod = reflect( vitesseMod , N );
+		}
 
         // appliquer la gravité
-        // ...
+        vec3 g = gravite * vec3(0., 0., -1.0);
+        vitesseMod += g * dt;
     }
 
     // Mettre un test bidon afin que l'optimisation du compilateur n'élimine pas les attributs dt, gravite, tempsMax posPuits et bDim.
