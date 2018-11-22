@@ -90,8 +90,4 @@ void main( void )
         vec3 g = gravite * vec3(0., 0., -1.0);
         vitesseMod += g * dt;
     }
-
-    // Mettre un test bidon afin que l'optimisation du compilateur n'élimine pas les attributs dt, gravite, tempsMax posPuits et bDim.
-    // Vous ENLEVEREZ cet énoncé inutile!
-    if ( dt+bDim.x+gravite+tempsMax+posPuits.x < -100000 ) tempsRestantMod += .000001;
 }
