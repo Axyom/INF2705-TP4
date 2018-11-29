@@ -32,6 +32,7 @@ void main()
     for ( int i = 0 ; i < 4 ; ++i )
     {
         float fact = gl_in[0].gl_PointSize / 25;
+        
         vec2 decalage = coins[i]; // on positionne successivement aux quatre coins
         vec4 pos = vec4( gl_in[0].gl_Position.xy + fact * decalage, gl_in[0].gl_Position.zw );
 
@@ -42,6 +43,13 @@ void main()
         if (texnumero == 1)
         {
 			AttribsOut.texCoord = texRot*coins[i] + vec2( 0.5, 0.5 ); // on utilise coins[] pour définir des coordonnées de texture	
+			
+			// rotation des coordonnees de texture
+			/*AttribsOut.texCoord = coins[i] + vec2( 0.5, 0.5 ); // (1) la coordonnee de texture initiale 
+			AttribsOut.texCoord -= vec2( 0.5, 0.5 ); // (2) on centre autour de 0
+			AttribsOut.texCoord = texRot * AttribsOut.texCoord; // (3) on effectue la rotation
+			AttribsOut.texCoord += vec2( 0.5, 0.5 ); // (4) on effectue la translation inverse a l'etape (2)*/
+			
 		}
 		else if (texnumero == 2 || texnumero == 3)
 		{

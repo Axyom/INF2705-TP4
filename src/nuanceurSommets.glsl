@@ -29,6 +29,8 @@ void main( void )
 
     // assigner la taille des points (en pixels)
     gl_PointSize = pointsize;
+    
+    //gl_PointSize = -pointsize/((matrProj * matrVisu * matrModel * Vertex).z);
 
 	vec3 v_visu = mat3(matrVisu * matrModel) * vitesse;
 	AttribsOut.sens = sign(v_visu.x);
